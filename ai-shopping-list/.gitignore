@@ -24,3 +24,4 @@ dist-ssr
 *.sw?
 
 src/utils/secret.js
+src/utils/paskaa.txt
