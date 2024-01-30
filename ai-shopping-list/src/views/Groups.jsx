@@ -13,6 +13,7 @@ import style from "../assets/style";
 const Groups = () => {
   const [createGroupOpen, setCreateGroupOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [refreshGroupList, setRefreshGroupList] = useState(false);
 
   const navigate = useNavigate();
 
@@ -48,9 +49,16 @@ const Groups = () => {
     <div className={style.body}>
       <Header onToggleButton={toggleButton} />
 
-      {createGroupOpen ? <CreateGroup onToggleButton={toggleButton} /> : <></>}
+      {createGroupOpen ? (
+        <CreateGroup
+          onToggleButton={toggleButton}
+          onAddGroup={() => setRefreshGroupList((prev) => !prev)}
+        />
+      ) : (
+        <></>
+      )}
 
-      <GroupList />
+      <GroupList refresh={refreshGroupList} />
 
       <div className={style.signOutButtonSectionGroup}>
         <button className={style.signOutButton} onClick={handleLogout}>

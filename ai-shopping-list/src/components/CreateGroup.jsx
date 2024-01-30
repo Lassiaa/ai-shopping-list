@@ -9,7 +9,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 import style from "../assets/style";
 
-const CreateGroup = ({ onToggleButton }) => {
+const CreateGroup = ({ onToggleButton, onAddGroup }) => {
   const [user, setUser] = useState("");
   const [username, setUsername] = useState("");
   const [groupName, setGroupName] = useState("");
@@ -90,12 +90,12 @@ const CreateGroup = ({ onToggleButton }) => {
 
       setNotification("Group " + groupName + " created!");
 
+      onAddGroup();
+
       setGroupName("");
       setParticipants([""]);
 
-      setTimeout(() => {
-        setNotification("");
-      }, 3000);
+      setNotification("");
     } catch (error) {
       console.error("Error adding user to group:", error);
     }
@@ -112,9 +112,7 @@ const CreateGroup = ({ onToggleButton }) => {
   };
 
   const handleClose = () => {
-    setTimeout(() => {
-      onToggleButton();
-    }, 3000);
+    onToggleButton(); // Close the CreateGroup component
   };
 
   return (
@@ -186,6 +184,7 @@ const CreateGroup = ({ onToggleButton }) => {
 
 CreateGroup.propTypes = {
   onToggleButton: PropTypes.func.isRequired,
+  onAddGroup: PropTypes.func.isRequired,
 };
 
 export default CreateGroup;

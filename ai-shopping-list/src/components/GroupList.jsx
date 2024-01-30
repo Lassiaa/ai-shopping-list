@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, firestore } from "../utils/firebase";
@@ -10,7 +11,7 @@ import CreateList from "../components/CreateList";
 
 import style from "../assets/style";
 
-const GroupList = () => {
+const GroupList = ({ refresh }) => {
   const [loggedUser, setLoggedUser] = useState(null);
   const [groups, setGroups] = useState([]);
   const [groupsLoaded, setGroupsLoaded] = useState(false);
@@ -57,7 +58,7 @@ const GroupList = () => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [refresh]);
 
   useEffect(() => {
     const fetchParticipants = async () => {
@@ -117,7 +118,7 @@ const GroupList = () => {
     };
 
     fetchParticipants();
-  }, [selectedGroup, loggedUser]);
+  }, [selectedGroup, loggedUser, refresh]);
 
   const handleListCreated = () => {
     setCreatingList(false);
@@ -176,6 +177,10 @@ const GroupList = () => {
       )}
     </>
   );
+};
+
+GroupList.propTypes = {
+  refresh: PropTypes.bool,
 };
 
 export default GroupList;

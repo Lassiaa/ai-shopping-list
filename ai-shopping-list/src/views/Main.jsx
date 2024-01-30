@@ -12,6 +12,7 @@ import style from "../assets/style";
 
 const Main = () => {
   const [generatorOpen, setGeneratorOpen] = useState(false);
+  const [refreshShoppingList, setRefreshShoppingList] = useState(false);
 
   const navigate = useNavigate();
 
@@ -47,9 +48,16 @@ const Main = () => {
     <div className={style.body}>
       <Header onToggleButton={toggleButton} />
 
-      {generatorOpen ? <AiGenerator onToggleButton={toggleButton} /> : <></>}
+      {generatorOpen ? (
+        <AiGenerator
+          onToggleButton={toggleButton}
+          onAddItem={() => setRefreshShoppingList((prev) => !prev)}
+        />
+      ) : (
+        <></>
+      )}
 
-      <ShoppingList />
+      <ShoppingList refresh={refreshShoppingList} />
 
       <div className={style.signOutButtonSection}>
         <button

@@ -8,7 +8,7 @@ import { onAuthStateChanged } from "firebase/auth";
 
 import style from "../assets/style";
 
-const AiGenerator = ({ onToggleButton }) => {
+const AiGenerator = ({ onToggleButton, onAddItem }) => {
   const [loggedUser, setLoggedUser] = useState(null);
   const [currentGroup, setCurrentGroup] = useState("");
   const [currentList, setCurrentList] = useState("");
@@ -138,6 +138,7 @@ const AiGenerator = ({ onToggleButton }) => {
                 }
 
                 await listDocRef.update({ items: listItems });
+                onAddItem();
               } else {
                 console.error("List document does not exist");
               }
@@ -255,6 +256,7 @@ const AiGenerator = ({ onToggleButton }) => {
 
 AiGenerator.propTypes = {
   onToggleButton: PropTypes.func.isRequired,
+  onAddItem: PropTypes.func.isRequired,
 };
 
 export default AiGenerator;

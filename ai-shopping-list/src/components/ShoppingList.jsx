@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 
 import { auth, firestore } from "../utils/firebase";
 import { onAuthStateChanged } from "firebase/auth";
@@ -7,7 +8,7 @@ import style from "../assets/style";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const ShoppingList = () => {
+const ShoppingList = ({ refresh }) => {
   const [loggedUser, setLoggedUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -137,7 +138,7 @@ const ShoppingList = () => {
     };
 
     fetchGroupsAndLists();
-  }, [loggedUser, currentGroup]);
+  }, [loggedUser, currentGroup, refresh]);
 
   const addItem = async (event) => {
     event.preventDefault();
@@ -349,6 +350,10 @@ const ShoppingList = () => {
       )}
     </>
   );
+};
+
+ShoppingList.propTypes = {
+  refresh: PropTypes.bool.isRequired,
 };
 
 export default ShoppingList;
