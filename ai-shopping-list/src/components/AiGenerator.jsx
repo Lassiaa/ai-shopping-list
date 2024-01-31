@@ -139,6 +139,11 @@ const AiGenerator = ({ onToggleButton, onAddItem }) => {
 
                 await listDocRef.update({ items: listItems });
                 onAddItem();
+
+                setTimeout(() => {
+                  setNotification("");
+                  onToggleButton();
+                }, 3000);
               } else {
                 console.error("List document does not exist");
               }
@@ -155,10 +160,6 @@ const AiGenerator = ({ onToggleButton, onAddItem }) => {
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
-
-    setTimeout(() => {
-      setNotification("");
-    }, 3000);
 
     const endTime = performance.now();
     const elapsedTime = (endTime - startTime) / 1000;
@@ -219,12 +220,6 @@ const AiGenerator = ({ onToggleButton, onAddItem }) => {
     }
   }, [formToggle, requestTime]);
 
-  const handleClose = () => {
-    setTimeout(() => {
-      onToggleButton();
-    }, 3000);
-  };
-
   return (
     <>
       <p className={style.notification}>{notification}</p>
@@ -240,10 +235,7 @@ const AiGenerator = ({ onToggleButton, onAddItem }) => {
         ></textarea>
 
         <button>
-          <p
-            className={style.buttonGenerate}
-            onClick={() => (handleGenerate(), handleClose())}
-          >
+          <p className={style.buttonGenerate} onClick={() => handleGenerate()}>
             Add to list
           </p>
         </button>

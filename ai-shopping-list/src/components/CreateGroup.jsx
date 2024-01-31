@@ -16,6 +16,8 @@ const CreateGroup = ({ onToggleButton, onAddGroup }) => {
   const [participants, setParticipants] = useState([""]);
   const [notification, setNotification] = useState("");
 
+  console.log(username);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -45,9 +47,38 @@ const CreateGroup = ({ onToggleButton, onAddGroup }) => {
     );
 
     try {
+      const userIds = await Promise.all(
+        sanitizedParticipants.map(async (participantUsername) => {
+          const userQuery = await firestore
+            .collection("users")
+            .where("username", "==", participantUsername)
+            .get();
+
+          if (!userQuery.empty) {
+            const userDoc = userQuery.docs[0];
+            return userDoc.id;
+          }
+
+          return null;
+        })
+      );
+
+      if (userIds.includes(null)) {
+        console.error(
+          "One or more participants not found in the users collection"
+        );
+        return;
+      }
+
       const group = {
         groupName,
-        participants: [username, ...sanitizedParticipants],
+        participants: [
+          { participantId: user, participantName: username },
+          ...sanitizedParticipants.map((participantName, index) => ({
+            participantId: userIds[index],
+            participantName,
+          })),
+        ],
       };
 
       const list = {
@@ -90,12 +121,15 @@ const CreateGroup = ({ onToggleButton, onAddGroup }) => {
 
       setNotification("Group " + groupName + " created!");
 
-      onAddGroup();
-
       setGroupName("");
       setParticipants([""]);
 
-      setNotification("");
+      await onAddGroup();
+
+      setTimeout(() => {
+        setNotification("");
+        onToggleButton();
+      }, 3000);
     } catch (error) {
       console.error("Error adding user to group:", error);
     }
@@ -109,10 +143,6 @@ const CreateGroup = ({ onToggleButton, onAddGroup }) => {
     const newParticipants = [...participants];
     newParticipants.splice(index, 1);
     setParticipants(newParticipants);
-  };
-
-  const handleClose = () => {
-    onToggleButton(); // Close the CreateGroup component
   };
 
   return (
@@ -168,11 +198,7 @@ const CreateGroup = ({ onToggleButton, onAddGroup }) => {
       </div>
 
       <div className={style.groupButtonContainer}>
-        <button
-          className={style.groupButton}
-          type="submit"
-          onClick={() => handleClose()}
-        >
+        <button className={style.groupButton} type="submit">
           Create group
         </button>
       </div>

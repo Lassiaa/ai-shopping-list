@@ -39,7 +39,7 @@ const Header = ({ onToggleButton }) => {
     if (pathName === "/") {
       setButtonText("Ai generator");
     } else if (pathName === "/groups") {
-      setButtonText("Create group");
+      setButtonText("New group");
     }
   }, []);
 

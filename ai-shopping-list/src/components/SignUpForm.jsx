@@ -31,7 +31,7 @@ const SignUpForm = () => {
   const handleJoinGroup = async (user) => {
     const group = {
       groupName: "My first group",
-      participants: [username],
+      participants: [{ participantId: user.uid, participantName: username }],
     };
 
     const list = {
@@ -65,6 +65,7 @@ const SignUpForm = () => {
       });
 
       await userDocRef.update({
+        userId: user.uid,
         groups: groups,
       });
 

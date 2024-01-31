@@ -71,7 +71,7 @@ const style = {
     "w-20 h-fit mx-auto bg-blue-400 hover:bg-blue-700 text-white p-2 ml-1 rounded-md ease-in-out duration-300",
 
   list: "w-2/3 mx-auto px-2 py-0 grid grid-cols-1 gap-4 my-4 bg-gray-200 rounded-md border border-gray-400",
-  listHeader: "text-md text-center font-bold py-4",
+  listHeader: "text-md text-center font-bold py-4 align-center",
   listEmpty: "w-full text-center text-gray-500 text-md font-bold p-4",
 
   itemSection: "w-full text-center flex my-4",
@@ -124,8 +124,16 @@ const style = {
   addListSection:
     "mt-2 w-full h-fit mx-auto bg-green-400 hover:bg-green-700 text-white p-2 rounded-md ease-in-out duration-300",
 
+  editHeader: "text-left flex align-center",
+  removeGroupButton:
+    "w-fit h-10 bg-red-400 hover:bg-red-700 text-white px-2 mr-2 rounded-md ease-in-out duration-300",
+
   // CreateList.jsx
   createListSection: "w-full flex mt-2",
+
+  editModeButton:
+    "w-fit h-fit mx-auto bg-blue-400 hover:bg-blue-700 text-white p-2 rounded-md ease-in-out duration-300 mb-2",
+
   createListInput: "rounded-md w-full h-10 px-2 border border-gray-400 mr-2",
   createListButton:
     "w-fit h-10 mx-auto bg-green-400 hover:bg-green-700 text-white px-2 rounded-md ease-in-out duration-300",

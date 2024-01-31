@@ -9,12 +9,9 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
 import PropTypes from "prop-types";
 
-const CreateList = ({ groupId, onListCreated }) => {
+const CreateList = ({ groupId, onListCreated, onAddList }) => {
   const [loggedUser, setLoggedUser] = useState(null);
   const [newListName, setNewListName] = useState("");
-
-  // console.log("User: " + loggedUser);
-  // console.log("Group: " + groupId);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -77,6 +74,7 @@ const CreateList = ({ groupId, onListCreated }) => {
       await groupDocRef.update({ lists: updatedLists });
 
       onListCreated(newList);
+      onAddList();
       setNewListName("");
     } catch (error) {
       console.error("Error creating list:", error);
@@ -102,6 +100,7 @@ const CreateList = ({ groupId, onListCreated }) => {
 CreateList.propTypes = {
   groupId: PropTypes.string.isRequired,
   onListCreated: PropTypes.func.isRequired,
+  onAddList: PropTypes.func.isRequired,
 };
 
 export default CreateList;

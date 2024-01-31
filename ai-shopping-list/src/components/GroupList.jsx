@@ -6,6 +6,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth, firestore } from "../utils/firebase";
 
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import CreateList from "../components/CreateList";
 
@@ -21,6 +22,13 @@ const GroupList = ({ refresh }) => {
   const [creatingList, setCreatingList] = useState(false);
 
   const [selectedGroupId, setSelectedGroupId] = useState(null);
+
+  const [refreshLists, setRefreshLists] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+
+  const handleToggleEditMode = () => {
+    setEditMode(!editMode);
+  };
 
   const handleListClick = (groupName, listName) => {
     localStorage.setItem(
@@ -91,7 +99,12 @@ const GroupList = ({ refresh }) => {
                 const groupData = groupDoc.data();
                 const groupParticipants = groupData.participants || [];
 
-                setParticipants(groupParticipants);
+                const participantNames = groupParticipants.map(
+                  (participant) => participant.participantName
+                );
+                console.log("Participant Names:", participantNames);
+
+                setParticipants(participantNames);
 
                 const listsRef = groupDocRef.collection("lists");
                 const listSnapshot = await listsRef.get();
@@ -118,10 +131,65 @@ const GroupList = ({ refresh }) => {
     };
 
     fetchParticipants();
-  }, [selectedGroup, loggedUser, refresh]);
+  }, [selectedGroup, loggedUser, refresh, refreshLists]);
 
   const handleListCreated = () => {
     setCreatingList(false);
+  };
+
+  const handleRemoveUserFromGroup = async (groupName, userId) => {
+    try {
+      const userDocRef = firestore.collection("users").doc(userId);
+      const userDoc = await userDocRef.get();
+
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        const userGroups = userData.groups || [];
+
+        const selectedGroupData = userGroups.find(
+          (group) => group.groupName === groupName
+        );
+
+        if (selectedGroupData) {
+          const groupId = selectedGroupData.groupId;
+
+          const groupDocRef = firestore
+            .collection("users")
+            .doc(userId)
+            .collection("groups")
+            .doc(groupId);
+
+          const groupDoc = await groupDocRef.get();
+
+          if (groupDoc.exists) {
+            const groupData = groupDoc.data();
+            const groupParticipants = groupData.participants || [];
+
+            const updatedParticipants = groupParticipants.filter(
+              (participant) => participant !== userId
+            );
+
+            if (userId === loggedUser.uid) {
+              await groupDocRef.update({ participants: updatedParticipants });
+            }
+
+            const updatedGroups = userGroups.filter(
+              (group) => group.groupName !== groupName
+            );
+
+            await userDocRef.update({ groups: updatedGroups });
+
+            setRefreshLists((prev) => !prev);
+          } else {
+            console.error("Group document does not exist");
+          }
+        } else {
+          console.error("Selected group not found in user data");
+        }
+      }
+    } catch (error) {
+      console.error("Error removing user from group:", error);
+    }
   };
 
   const listGroups = groups.map((item, index) => (
@@ -130,7 +198,20 @@ const GroupList = ({ refresh }) => {
         className={style.groupListButton}
         onClick={() => setSelectedGroup(item)}
       >
-        <h3 className={style.groupSection}>{item}</h3>
+        <div className={style.editHeader}>
+          {editMode && (
+            <button
+              className={style.removeGroupButton}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRemoveUserFromGroup(item, loggedUser.uid);
+              }}
+            >
+              <DeleteIcon />
+            </button>
+          )}
+          <h3 className={style.groupSection}>{item}</h3>
+        </div>
         <p className={style.participantsSection}>
           {selectedGroup === item ? participants.join(", ") : ""}
         </p>
@@ -157,6 +238,7 @@ const GroupList = ({ refresh }) => {
               <CreateList
                 groupId={selectedGroupId}
                 onListCreated={handleListCreated}
+                onAddList={() => setRefreshLists((prev) => !prev)}
               />
             )}
           </>
@@ -173,6 +255,11 @@ const GroupList = ({ refresh }) => {
         <div className={style.groupListSection}>
           <h2 className={style.listHeader}>My groups</h2>
           <ul className={style.GroupList}>{listGroups}</ul>
+          <div className={style.editModeButton}>
+            <button onClick={handleToggleEditMode}>
+              {editMode ? "Done" : "Edit groups"}
+            </button>
+          </div>
         </div>
       )}
     </>
